@@ -4,6 +4,13 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+: "${CI_IMAGE:="mamachanko/build-env"}"
+
+docker build \
+  ci \
+  --file ci/Dockerfile \
+  --tag "${CI_IMAGE}"
+
 docker run \
   --rm \
   -it \
@@ -11,5 +18,6 @@ docker run \
   --network host \
   --volume $(pwd):/src \
   --volume ~/.gradle:/root/.gradle \
-  -w /src concourse-build-env \
-  ./scripts/ci-build-api.sh
+  -w /src \
+  "${CI_IMAGE}" \
+  ./scripts/build-api.sh
